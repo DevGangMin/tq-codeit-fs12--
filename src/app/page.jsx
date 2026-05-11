@@ -1,49 +1,27 @@
 "use client";
 
-// useState: 상태 관리 / useEffect: 컴포넌트 마운트 시 사이드이펙트 실행
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import TodoList from "./_components/TodoList";
 import { fetchTodos } from "@/api/todos";
 
 export default function Home() {
-  // 초기값 설정
-  const [todos, setTodos] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // 서버에서 할 일 목록을 가져와 상태를 업데이트하는 함수
-  const loadTodos = async () => {
-    try {
-      // 정상적으로 데이터를 가져오면 상태 업데이트
-      const data = await fetchTodos();
-      setTodos(data);
-    } catch (error) {
-      // fetchTodos에서 에러 발생 시 에러 메시지를 상태에 저장
-      setError(error.message);
-    } finally {
-      // 성공/실패 여부와 관계없이 항상 로딩 상태 해제
-      setIsLoading(false);
-    }
-  };
-
-  // 컴포넌트가 처음 렌더링될 때 1회만 실행
-  useEffect(() => {
-    loadTodos();
-  }, []);
+  const { data: todos, isLoading, error } = useQuery({
+    queryKey: ["todos"],
+    queryFn: fetchTodos,
+  });
 
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8 text-center text-red-500">
-        {error}
+        {error.message}
       </div>
     );
   }
 
-  // isLoading이 true인 동안 로딩 UI 선 렌더링
   if (isLoading) {
-    return (<div className="container mx-auto px-4 py-8 text-center">로딩 중...</div>
-    );
+    return <div className="container mx-auto px-4 py-8 text-center">로딩 중...</div>;
   }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">투두리스트</h1>
