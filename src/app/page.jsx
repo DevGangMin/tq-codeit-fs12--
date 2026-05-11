@@ -1,35 +1,24 @@
 "use client";
 
-import { useState } from "react";
+// useState: 상태 관리 / useEffect: 컴포넌트 마운트 시 사이드이펙트 실행
+import { useState, useEffect } from "react";
 import TodoList from "./_components/TodoList";
-
-const initialTodos = [
-  {
-    id: 1,
-    title: "할 일 1",
-    completed: false,
-  },
-  {
-    id: 2,
-    title: "할 일 2",
-    completed: true,
-  },
-  {
-    id: 3,
-    title: "할 일 3",
-    completed: false,
-  },
-];
+import { fetchTodos } from "@/api/todos";
 
 export default function Home() {
-  const [todos, setTodos] = useState(initialTodos);
+  // 초기값 설정
+  const [todos, setTodos] = useState([]);
 
+  // 서버에서 할 일 목록을 가져와 상태를 업데이트하는 함수
   const loadTodos = async () => {
-    // TODO: 할 일 목록을 가져오는 로직 추가
-    // - initialTodos 제거하고 초기값 빈 배열 [] 적용
-    // - useEffect 콜백 함수 내에서 사용
-    // - fetchTodos 함수 호출
+    const data = await fetchTodos();
+    setTodos(data);
   };
+
+  // 컴포넌트가 처음 렌더링될 때 1회만 실행
+  useEffect(() => {
+    loadTodos();
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8">
